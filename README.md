@@ -1,0 +1,1 @@
+# Funciones útiles para PHP
