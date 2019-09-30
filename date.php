@@ -113,4 +113,17 @@ function get_full_date(string $timestamp) : string {
     return get_date_from_timestamp($timestamp)." a las ".get_time_from_timestamp($timestamp);
 }
 
+//Convierte Timestamp de JavaScript a Timestamp de PHP -- RetaxMaster
+
+function convert_javascript_timestamp_to_php_timestamp(string $timestamp) {
+    $timestamp = substr($timestamp, 0, -1);
+    return explode(".", implode(" ", explode("T", $timestamp)))[0];
+}
+
+//Obtiene una fecha entera a partir de un timestamp de JavaScript - RetaxMaster
+function get_full_date_from_javascript_timestamp(string $timestamp) : string{
+    $timestamp = convert_javascript_timestamp_to_php_timestamp($timestamp);
+    return get_full_date($timestamp);
+}
+
 ?>

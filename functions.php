@@ -283,23 +283,33 @@ function remove_spaces(string $string) : string {
 }
 
 //Envía una cURL -- RetaxMaster
-function send_curl(string $url, array $params, string $contentType) : string {
+function send_curl(string $url, string $method, array $params = [], $responseType = "text") {
     $ch = curl_init();
 
-    curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     
-    $headers = array("Content-Type: $contentType");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    if(mb_strtoupper($method) != "GET"){
+        $headers = array("Content-Type: application/json");
 
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, mb_strtoupper($method));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    }
+    else {
+        if(!empty($params)) $url .= "?".http_build_query($params);
+        $url = preg_replace("/%2F/", "/", $url);
+        $url = preg_replace("/%2C/", ",", $url);
+    }
+    
+    curl_setopt($ch, CURLOPT_URL, $url);
     $result = curl_exec($ch);
     if (curl_errno($ch)) {
         return 'Error:' . curl_error($ch);
     }
-    curl_close ($ch);
-    return $result;
+
+    curl_close($ch);
+    return ($responseType == "array") ? json_decode($result, true) : $result;
 }
 
 //Obtiene la IP actual con la cual está logueado el usuario -- RetaxMaster
